@@ -20,7 +20,7 @@
 
   vars:
     _elastic_refresh_interval: "{{ (elasticsearch_beat_settings.number_of_replicas | int) * 5 }}"
-    elastic_refresh_interval: "{{ (_elastic_refresh_interval > 0) | ternary(30, _elastic_refresh_interval) }}"
+    elastic_refresh_interval: "{{ ((_elastic_refresh_interval | int) > 0) | ternary(30, _elastic_refresh_interval) }}"
 
   vars_files:
     - vars/variables.yml
@@ -28,6 +28,18 @@
   environment: "{{ deployment_environment_variables | default({}) }}"
 
   post_tasks:
+    - name: Debug var - nodes
+      debug:
+        var: data_nodes
+    - name: Debug var - replicas
+      debug:
+        var: elasticsearch_beat_settings.number_of_replicas
+    - name: Debug var - _elastic_refresh_interval
+      debug:
+        var: _elastic_refresh_interval
+    - name: Debug var - elastic_refresh_interval
+      debug:
+        var: elastic_refresh_interval
     - name: Create beat indexes
       uri:
         url: http://127.0.0.1:9200/{{ item.name }}
@@ -227,25 +239,26 @@
       delay: 30
       run_once: true
 
-    - name: Create basic indexes
-      uri:
-        url: "http://127.0.0.1:5601/api/kibana/settings/defaultIndex"
-        method: POST
-        body: "{{ item.index_options | to_json }}"
-        status_code: 200
-        body_format: json
-        headers:
-          Content-Type: "application/json"
-          kbn-xsrf: "{{ inventory_hostname | to_uuid }}"
-      with_items:
-        - name: "default"
-          index_options:
-            value: "default"
-      register: kibana_indexes
-      until: kibana_indexes is success
-      retries: 6
-      delay: 30
-      run_once: true
+    # - name: Create basic indexes
+    #   uri:
+    #     url: "http://127.0.0.1:5601/api/kibana/settings/defaultIndex"
+    #     method: POST
+    #     body: "{{ item.index_options | to_json }}"
+    #     status_code: 200
+    #     body_format: json
+    #     headers:
+    #       Content-Type: "application/json"
+    #       kbn-xsrf: "{{ inventory_hostname | to_uuid }}"
+    #   with_items:
+    #     - name: "default"
+    #       index_options:
+    #         value: "default"
+    #   register: kibana_indexes
+    #   until: kibana_indexes is success
+    #   retries: 6
+    #   delay: 30
+    #   run_once: true
+    #   ignore_errors: True
 
   tags:
     - server-install

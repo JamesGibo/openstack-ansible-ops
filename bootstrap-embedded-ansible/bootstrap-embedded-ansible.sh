@@ -48,10 +48,10 @@ if [[ ! -e "${ANSIBLE_EMBED_HOME}/bin/ansible" ]]; then
     exit 99
   fi
   echo "done installing python-virtualenv"
-  if [[ -f "/usr/bin/python2" ]]; then
-    virtualenv --system-site-packages --python="/usr/bin/python2" "${ANSIBLE_EMBED_HOME}"
-  elif [[ -f "/usr/bin/python3" ]]; then
+  if [[ -f "/usr/bin/python3" ]]; then
     virtualenv --system-site-packages --python="/usr/bin/python3" "${ANSIBLE_EMBED_HOME}"
+  elif [[ -f "/usr/bin/python2" ]]; then
+    virtualenv --system-site-packages --python="/usr/bin/python2" "${ANSIBLE_EMBED_HOME}"
   else
     virtualenv "${ANSIBLE_EMBED_HOME}"
   fi
