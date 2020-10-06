@@ -145,7 +145,7 @@
     - name: Run functional test
       become: yes
       become_user: root
-      command: "${HOME}/ansible_venv/bin/ansible-playbook -i tests/{{ inventory_file }} -e @tests/test-vars.yml site.yml"
+      command: "${HOME}/ansible_venv/bin/ansible-playbook -i tests/{{ inventory_file }} --connection=local -e @tests/test-vars.yml site.yml"
       environment:
         ANSIBLE_LOG_PATH: "/tmp/elk-metrics-7x-logs/ansible-elk-test-deployment.log"
       args:
@@ -154,7 +154,7 @@
     - name: Show cluster state
       become: yes
       become_user: root
-      command: "${HOME}/ansible_venv/bin/ansible-playbook -i tests/{{ inventory_file }} -e @tests/test-vars.yml showElasticCluster.yml"
+      command: "${HOME}/ansible_venv/bin/ansible-playbook -i tests/{{ inventory_file }} --connection=local -e @tests/test-vars.yml showElasticCluster.yml"
       environment:
         ANSIBLE_LOG_PATH: "/tmp/elk-metrics-7x-logs/ansible-elk-test-show-cluster.log"
       args:

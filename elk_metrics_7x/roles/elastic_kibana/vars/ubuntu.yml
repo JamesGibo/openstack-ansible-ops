@@ -16,6 +16,6 @@
 kibana_nginx_vhost_path: /etc/nginx/sites-available
 kibana_distro_packages:
   - apache2-utils
-  - kibana
+  - kibana=7.8.1
   - nginx
   - python-passlib
