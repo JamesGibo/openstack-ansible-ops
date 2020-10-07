@@ -38,10 +38,12 @@ export ID="$(echo ${ID} | awk -F'-' '{print $1}')"
 if [[ ! -e "${ANSIBLE_EMBED_HOME}/bin/ansible" ]]; then
   if [  ${ID} = "ubuntu" ]; then
     apt-get update
-    apt-get -y install python-virtualenv
+    apt-get -y install virtualenv
   elif [  ${ID} = "opensuse" ] || [ ${ID} = "suse" ]; then
+    zypper install -y insserv
     zypper install -y python-virtualenv
   elif [ ${ID} = "centos" ] || [ ${ID} = "redhat" ] || [ ${ID} = "rhel" ]; then
+    yum install -y virtualenv
     yum install -y python-virtualenv
   else
     echo "Unknown operating system"
