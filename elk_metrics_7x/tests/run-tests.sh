@@ -39,8 +39,15 @@ if [[ ! -e "${TEST_DIR}/elk_metrics_7x/tests/src" ]]; then
   ln -s ${TEST_DIR}/../ ${TEST_DIR}/elk_metrics_7x/tests/src
 fi
 
+if [[ -f "/usr/bin/python3" ]]; then
+  export PYTHON_INTERPRETER="/usr/bin/python3"
+else
+  export PYTHON_INTERPRETER="/usr/bin/python"
+fi
+
 ${HOME}/ansible_venv/bin/ansible-playbook -i 'localhost,' \
                                        -vv \
                                        -e ansible_connection=local \
                                        -e test_clustered_elk=${CLUSTERED:-no} \
+                                       -e 'ansible_python_interpreter=${PYTHON_INTERPRETER}' \
                                        ${TEST_DIR}/elk_metrics_7x/tests/test.yml

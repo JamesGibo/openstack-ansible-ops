@@ -20,7 +20,7 @@ export OPTS=()
 export CLONE_DIR="$(dirname $(readlink -f ${BASH_SOURCE[0]}))"
 OPTS+=('CLONE_DIR')
 
-export ANSIBLE_VERSION="${ANSIBLE_VERSION:-2.7.5.0}"
+export ANSIBLE_VERSION="${ANSIBLE_VERSION:-2.7.18.0}"
 OPTS+=('ANSIBLE_VERSION')
 
 export ANSIBLE_EMBED_HOME="${HOME}/ansible_venv"
@@ -31,6 +31,8 @@ OPTS+=('ANSIBLE_ROLE_REQUIREMENTS')
 
 export ANSIBLE_PYTHON_REQUIREMENTS="${ANSIBLE_PYTHON_REQUIREMENTS:-${CLONE_DIR}/python-requirements.txt}"
 OPTS+=('ANSIBLE_PYTHON_REQUIREMENTS')
+
+export PYTHON_INTERPRETER="/usr/bin/python3"
 
 source /etc/os-release
 export ID="$(echo ${ID} | awk -F'-' '{print $1}')"
@@ -54,6 +56,7 @@ if [[ ! -e "${ANSIBLE_EMBED_HOME}/bin/ansible" ]]; then
     virtualenv --system-site-packages --python="/usr/bin/python3" "${ANSIBLE_EMBED_HOME}"
   elif [[ -f "/usr/bin/python2" ]]; then
     virtualenv --system-site-packages --python="/usr/bin/python2" "${ANSIBLE_EMBED_HOME}"
+    export PYTHON_INTERPRETER="/usr/bin/python3"
   else
     virtualenv "${ANSIBLE_EMBED_HOME}"
   fi
@@ -64,7 +67,7 @@ fi
 # Run ansible setup
 eval "${ANSIBLE_EMBED_HOME}/bin/pip install --upgrade ansible=='${ANSIBLE_VERSION}' --isolated"
 eval "${ANSIBLE_EMBED_HOME}/bin/ansible-galaxy install --force --role-file='${ANSIBLE_ROLE_REQUIREMENTS}' --roles-path='${ANSIBLE_EMBED_HOME}/repositories/roles'"
-eval "${ANSIBLE_EMBED_HOME}/bin/ansible-playbook -i 'localhost,' '${CLONE_DIR}/embedded-ansible-setup.yml' -e 'ansible_venv_path=${ANSIBLE_EMBED_HOME}' -e 'ansible_python_requirement_file=${ANSIBLE_PYTHON_REQUIREMENTS}'"
+eval "${ANSIBLE_EMBED_HOME}/bin/ansible-playbook -i 'localhost,' '${CLONE_DIR}/embedded-ansible-setup.yml' -e 'ansible_venv_path=${ANSIBLE_EMBED_HOME}' -e 'ansible_python_requirement_file=${ANSIBLE_PYTHON_REQUIREMENTS}' -e 'ansible_python_interpreter=${PYTHON_INTERPRETER}'"
 
 if [[ -f "/etc/openstack_deploy/openstack_inventory.json" ]]; then
   export USER_VARS="$(for i in $(ls -1 /etc/openstack_deploy/user_*secret*.yml); do echo -n "-e@$i "; done)"
